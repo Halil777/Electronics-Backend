@@ -33,8 +33,8 @@ import { Product } from './modules/products/entities/product.entity';
   imports: [
     // Serve static files
     ServeStaticModule.forRoot({
-      rootPath: path.join(__dirname, '..', 'public'), // Updated to 'public' for better convention
-      serveRoot: '/static', // Optional: Serve files under `/static` path
+      rootPath: path.join(__dirname, '..', 'upload'), // Updated to 'public' for better convention
+      serveRoot: '/upload', // Optional: Serve files under `/static` path
     }),
 
     // File upload configuration
@@ -58,9 +58,9 @@ import { Product } from './modules/products/entities/product.entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: +process.env.DB_PORT || 5432,
+      port: +process.env.DB_PORT || 5433,
       username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
+      password: process.env.DB_PASSWORD || 'QwertyWeb123',
       database: process.env.DB_DATABASE || 'electronics_db',
       entities: [
         Category,
