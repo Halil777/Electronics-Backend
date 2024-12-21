@@ -15,7 +15,7 @@ export class Subcategory {
   id: number;
 
   @Column({ nullable: true })
-  image?: string;
+  imageUrl?: string;
 
   @Column({ type: 'varchar', length: 255 })
   title_tm: string;

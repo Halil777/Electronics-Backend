@@ -33,7 +33,7 @@ export class CreateSubcategoryDto {
   })
   @IsOptional()
   @IsString()
-  image?: string; // Optional image URL
+  imageUrl?: string; // Optional image URL
 
   @ApiProperty({
     description: 'The description of the subcategory in Turkmen.',

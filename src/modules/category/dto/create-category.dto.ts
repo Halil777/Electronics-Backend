@@ -28,5 +28,5 @@ export class CreateCategoryDto {
 
   @IsOptional()
   @IsString()
-  filePath?: string; // Add this field to handle the file path
+  filePath?: string;
 }
