@@ -38,12 +38,10 @@ export class Subcategory {
   // Establish a many-to-one relationship with the Category
   @ManyToOne(() => Category, (category) => category.subcategories, {
     nullable: false,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'category_id' })
   category: Category;
-
-  @Column()
-  category_id: number;
 
   // Establish a one-to-many relationship with the Brand
   @OneToMany(() => Brand, (brand) => brand.subcategory)

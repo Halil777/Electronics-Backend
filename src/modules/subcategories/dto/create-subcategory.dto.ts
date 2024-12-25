@@ -4,68 +4,68 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateSubcategoryDto {
   @ApiProperty({
     description: 'The title of the subcategory in Turkmen.',
-    example: 'Elektronika', // Example for Swagger UI
+    example: 'Elektronika',
   })
   @IsString()
   @IsNotEmpty()
-  title_tm: string; // Title in Turkmen
+  title_tm: string;
 
   @ApiProperty({
     description: 'The title of the subcategory in Russian.',
-    example: 'Электроника', // Example for Swagger UI
+    example: 'Электроника',
   })
   @IsString()
   @IsNotEmpty()
-  title_ru: string; // Title in Russian
+  title_ru: string;
 
   @ApiProperty({
     description: 'The title of the subcategory in English.',
-    example: 'Electronics', // Example for Swagger UI
+    example: 'Electronics',
   })
   @IsString()
   @IsNotEmpty()
-  title_en: string; // Title in English
+  title_en: string;
 
   @ApiProperty({
     description: 'The optional image URL for the subcategory.',
-    example: 'https://example.com/image.jpg', // Example for Swagger UI
+    example: 'https://example.com/image.jpg',
     required: false,
   })
   @IsOptional()
   @IsString()
-  imageUrl?: string; // Optional image URL
+  imageUrl?: string;
 
   @ApiProperty({
     description: 'The description of the subcategory in Turkmen.',
-    example: 'Türkmeňe elektronika önümleri', // Example for Swagger UI
+    example: 'Türkmeňe elektronika önümleri',
     required: false,
   })
   @IsOptional()
   @IsString()
-  desc_tm?: string; // Description in Turkmen
+  desc_tm?: string;
 
   @ApiProperty({
     description: 'The description of the subcategory in Russian.',
-    example: 'Туркменская электроника', // Example for Swagger UI
+    example: 'Туркменская электроника',
     required: false,
   })
   @IsOptional()
   @IsString()
-  desc_ru?: string; // Description in Russian
+  desc_ru?: string;
 
   @ApiProperty({
     description: 'The description of the subcategory in English.',
-    example: 'Turkmen electronics', // Example for Swagger UI
+    example: 'Turkmen electronics',
     required: false,
   })
   @IsOptional()
   @IsString()
-  desc_en?: string; // Description in English
+  desc_en?: string;
 
   @ApiProperty({
     description: 'The category ID this subcategory belongs to.',
-    example: 1, // Example for Swagger UI
+    example: 1,
   })
   @IsInt()
-  category_id: number; // Foreign key to the category
+  category_id: number;
 }

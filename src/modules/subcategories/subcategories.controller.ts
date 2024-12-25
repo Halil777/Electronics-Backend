@@ -48,15 +48,6 @@ export class SubcategoriesController {
     return await this.subcategoriesService.getAllSubcategories();
   }
 
-  // @Get(':id')
-  // async findOne(@Param('id') id: string) {
-  //   const subcategory = await this.subcategoriesService.findOne(+id);
-  //   if (!subcategory) {
-  //     throw new BadRequestException(`Subcategory with ID ${id} not found`);
-  //   }
-  //   return subcategory;
-  // }
-
   @Patch(':id')
   @UseInterceptors(
     FileInterceptor('file', {

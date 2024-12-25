@@ -28,6 +28,7 @@ import { EmbassyRule } from './modules/embassy_rules/entities/embassy_rule.entit
 import { Subcategory } from './modules/subcategories/entities/subcategory.entity';
 import { Brand } from './modules/brands/entities/brand.entity';
 import { Product } from './modules/products/entities/product.entity';
+import { SegmentModule } from './modules/segment/segment.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { Product } from './modules/products/entities/product.entity';
     SubcategoriesModule,
     BrandsModule,
     ProductsModule,
+    SegmentModule,
   ],
   controllers: [],
   providers: [],
