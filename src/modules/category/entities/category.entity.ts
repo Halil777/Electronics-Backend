@@ -1,3 +1,4 @@
+import { Product } from 'src/modules/products/entities/product.entity';
 import { Subcategory } from 'src/modules/subcategories/entities/subcategory.entity';
 import {
   Entity,
@@ -6,6 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -36,6 +39,10 @@ export class Category {
 
   @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
   subcategories: Subcategory[];
+
+  @ManyToMany(() => Product, (product) => product.categories)
+  @JoinTable({ name: 'product_categories' })
+  products: Product[];
 
   @CreateDateColumn()
   createdAt: Date;

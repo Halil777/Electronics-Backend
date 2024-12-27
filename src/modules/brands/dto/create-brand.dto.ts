@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateBrandDto {
   @ApiProperty({
@@ -33,7 +33,7 @@ export class CreateBrandDto {
   })
   @IsOptional()
   @IsString()
-  image?: string;
+  imageUrl?: string;
 
   @ApiProperty({
     description: 'The description of the subcategory in Turkmen.',
@@ -62,10 +62,9 @@ export class CreateBrandDto {
   @IsString()
   desc_en?: string; // Description in English
 
-  @ApiProperty({
-    description: 'The category ID this subcategory belongs to.',
-    example: 1,
-  })
-  @IsInt()
-  subcategory_id: number;
+  // @ApiProperty({
+  //   description: 'The category ID this subcategory belongs to.',
+  //   example: 1,
+  // })
+  // subcategory_id: number;
 }

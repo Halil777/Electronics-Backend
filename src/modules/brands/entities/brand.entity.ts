@@ -1,11 +1,11 @@
 import { Product } from 'src/modules/products/entities/product.entity';
-import { Subcategory } from 'src/modules/subcategories/entities/subcategory.entity';
+// import { Subcategory } from 'src/modules/subcategories/entities/subcategory.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
+  // ManyToOne,
+  // JoinColumn,
   OneToMany,
 } from 'typeorm';
 
@@ -15,7 +15,7 @@ export class Brand {
   id: number;
 
   @Column({ nullable: true })
-  image?: string;
+  imageUrl?: string;
 
   @Column({ type: 'varchar', length: 255 })
   title_tm: string;
@@ -35,15 +35,15 @@ export class Brand {
   @Column({ type: 'text', nullable: true })
   desc_en?: string;
 
-  @ManyToOne(() => Subcategory, (subcategory) => subcategory.brands, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'subcategory_id' })
-  subcategory: Subcategory;
+  // @ManyToOne(() => Subcategory, (subcategory) => subcategory.brands, {
+  //   nullable: false,
+  // })
+  // @JoinColumn({ name: 'subcategory_id' })
+  // subcategory: Subcategory;
 
   @OneToMany(() => Product, (products) => products.brand)
   products: Product[];
 
-  @Column()
-  subcategory_id: number;
+  // @Column()
+  // subcategory_id: number;
 }

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSubcategoryDto {
@@ -66,6 +66,5 @@ export class CreateSubcategoryDto {
     description: 'The category ID this subcategory belongs to.',
     example: 1,
   })
-  @IsInt()
   category_id: number;
 }

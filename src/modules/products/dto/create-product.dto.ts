@@ -1,11 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsArray,
   IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class ImageDto {
+  @ApiProperty({
+    example: 'https://example.com/image1.jpg',
+    description: 'URL of the product image',
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+
+  @ApiProperty({
+    example: 'Product Image',
+    description: 'Alternative text for the image',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  alt_text?: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Is this main image',
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  is_main?: boolean;
+}
 
 export class CreateProductDto {
   @ApiProperty({
@@ -63,7 +95,6 @@ export class CreateProductDto {
     example: 99.99,
     description: 'Цена продукта',
   })
-  @IsNumber()
   @IsNotEmpty()
   price: number;
 
@@ -72,7 +103,6 @@ export class CreateProductDto {
     description: 'Старая цена продукта (для отображения скидки)',
     required: false,
   })
-  @IsNumber()
   @IsOptional()
   old_price?: number;
 
@@ -81,7 +111,6 @@ export class CreateProductDto {
     description: 'Процент скидки на продукт',
     required: false,
   })
-  @IsNumber()
   @IsOptional()
   discount_percentage?: number;
 
@@ -90,7 +119,6 @@ export class CreateProductDto {
     description: 'Цена со скидкой (если рассчитывается заранее)',
     required: false,
   })
-  @IsNumber()
   @IsOptional()
   discounted_price?: number;
 
@@ -98,8 +126,6 @@ export class CreateProductDto {
     example: 50,
     description: 'Количество товара на складе',
   })
-  @IsNumber()
-  @IsNotEmpty()
   stock: number;
 
   @ApiProperty({
@@ -125,34 +151,71 @@ export class CreateProductDto {
     description: 'Вес продукта в килограммах',
     required: false,
   })
-  @IsNumber()
   @IsOptional()
   weight?: number;
 
   @ApiProperty({
-    example: '/images/product1.jpg',
-    description: 'Основное изображение продукта',
+    example: [
+      {
+        url: 'https://example.com/image1.jpg',
+        alt_text: 'Product Image',
+        is_main: true,
+      },
+      {
+        url: 'https://example.com/image2.jpg',
+        alt_text: 'Product Image 2',
+      },
+    ],
+    description: 'Images of the product with details',
     required: false,
   })
-  @IsString()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ImageDto)
   @IsOptional()
-  image?: string;
+  images?: ImageDto[];
 
   @ApiProperty({
-    example: '/images/gallery1.jpg,/images/gallery2.jpg',
-    description: 'Список дополнительных изображений продукта',
+    example: 'Small',
+    description: 'Size of product',
     required: false,
   })
   @IsString()
   @IsOptional()
-  images?: string;
+  size?: string;
+
+  @ApiProperty({
+    example: 'Red',
+    description: 'Color of product',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  color?: string;
+
+  @ApiProperty({
+    example: ['Tag1', 'Tag2'],
+    description: 'Tags of product',
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
+
+  @ApiProperty({
+    example: 'https://example.com/product-video.mp4',
+    description: 'Video URL of product',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  video_url?: string;
 
   @ApiProperty({
     example: 0,
     description: 'Количество просмотров продукта',
     required: false,
   })
-  @IsNumber()
   @IsOptional()
   views?: number;
 
@@ -161,15 +224,14 @@ export class CreateProductDto {
     description: 'Рейтинг продукта от пользователей (1-5)',
     required: false,
   })
-  @IsNumber()
   @IsOptional()
   rating?: number;
 
   @ApiProperty({
     example: 1,
     description: 'Идентификатор бренда, к которому относится продукт',
+    required: false,
   })
-  @IsNumber()
-  @IsNotEmpty()
-  brand_id: number;
+  @IsOptional()
+  brand_id?: number;
 }

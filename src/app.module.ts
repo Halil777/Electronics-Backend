@@ -16,6 +16,7 @@ import { EmbassyRulesModule } from './modules/embassy_rules/embassy_rules.module
 import { SubcategoriesModule } from './modules/subcategories/subcategories.module';
 import { BrandsModule } from './modules/brands/brands.module';
 import { ProductsModule } from './modules/products/products.module';
+import { SegmentModule } from './modules/segment/segment.module';
 
 // Entities
 import { Category } from './modules/category/entities/category.entity';
@@ -28,7 +29,7 @@ import { EmbassyRule } from './modules/embassy_rules/entities/embassy_rule.entit
 import { Subcategory } from './modules/subcategories/entities/subcategory.entity';
 import { Brand } from './modules/brands/entities/brand.entity';
 import { Product } from './modules/products/entities/product.entity';
-import { SegmentModule } from './modules/segment/segment.module';
+import { Segment } from './modules/segment/entities/segment.entity';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { SegmentModule } from './modules/segment/segment.module';
         Subcategory,
         Brand,
         Product,
+        Segment,
       ],
       synchronize: true, // Automatically sync schema; turn off in production
       logging: true,

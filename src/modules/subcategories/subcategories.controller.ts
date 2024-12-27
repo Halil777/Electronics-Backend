@@ -1,21 +1,21 @@
 import {
   Controller,
-  Get,
   Post,
-  Body,
-  Patch,
+  Get,
   Param,
-  Delete,
+  Body,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Delete,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { SubcategoriesService } from './subcategories.service';
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
 import { UpdateSubcategoryDto } from './dto/update-subcategory.dto';
+import { editFileName } from '../category/category.controller';
 
 @Controller('subcategories')
 export class SubcategoriesController {
@@ -38,7 +38,7 @@ export class SubcategoriesController {
       throw new BadRequestException('No image file provided');
     }
     return await this.subcategoriesService.addSubcategory(
-      file.path,
+      file,
       createSubcategoryDto,
     );
   }
@@ -67,11 +67,12 @@ export class SubcategoriesController {
         +id,
         file.path,
       );
+    } else {
+      return await this.subcategoriesService.updateSubcategory(
+        +id,
+        updateSubcategoryDto,
+      );
     }
-    return await this.subcategoriesService.updateSubcategory(
-      +id,
-      updateSubcategoryDto,
-    );
   }
 
   @Delete(':id')
@@ -79,14 +80,3 @@ export class SubcategoriesController {
     return await this.subcategoriesService.deleteSubcategory(+id);
   }
 }
-
-// Helper function to generate unique file names
-export const editFileName = (req, file, callback) => {
-  const name = file.originalname.split('.')[0];
-  const fileExtName = extname(file.originalname);
-  const randomName = Array(4)
-    .fill(null)
-    .map(() => Math.round(Math.random() * 16).toString(16))
-    .join('');
-  callback(null, `${name}-${randomName}${fileExtName}`);
-};

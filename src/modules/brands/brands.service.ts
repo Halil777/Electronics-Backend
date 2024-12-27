@@ -1,49 +1,116 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Brand } from './entities/brand.entity';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Brand } from './entities/brand.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class BrandsService {
   constructor(
     @InjectRepository(Brand)
-    private brandsRepository: Repository<Brand>,
+    private readonly brandsRepository: Repository<Brand>,
   ) {}
 
-  // Create a new brand
-  async create(createBrandDto: CreateBrandDto): Promise<Brand> {
-    const brand = this.brandsRepository.create(createBrandDto);
-    return await this.brandsRepository.save(brand);
+  // Create brand with image path
+  async create(image: string, body: CreateBrandDto): Promise<Brand> {
+    try {
+      const brand = new Brand();
+      brand.imageUrl = image;
+      brand.desc_tm = body.desc_tm;
+      brand.desc_ru = body.desc_ru;
+      brand.desc_en = body.desc_en;
+      brand.title_tm = body.title_tm;
+      brand.title_ru = body.title_ru;
+      brand.title_en = body.title_en;
+      return await this.brandsRepository.save(brand);
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
+  }
+
+  // Update brand
+  async update(id: number, body: UpdateBrandDto): Promise<Brand> {
+    try {
+      const brand = await this.brandsRepository.findOne({ where: { id } });
+      if (!brand) {
+        throw new NotFoundException(`Brand with ID ${id} not found`);
+      }
+
+      brand.desc_tm = body.desc_tm || brand.desc_tm;
+      brand.desc_ru = body.desc_ru || brand.desc_ru;
+      brand.desc_en = body.desc_en || brand.desc_en;
+      brand.title_tm = body.title_tm || brand.title_tm;
+      brand.title_ru = body.title_ru || brand.title_ru;
+      brand.title_en = body.title_en || brand.title_en;
+
+      await this.brandsRepository.update(id, brand);
+      return brand;
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
   }
 
   // Get all brands
   async findAll(): Promise<Brand[]> {
-    return await this.brandsRepository.find();
+    try {
+      const brands = await this.brandsRepository.find();
+      return brands.map((brand) => ({
+        ...brand,
+        imageUrl: process.env.BASE_URL + '/' + brand.imageUrl,
+      }));
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
   }
 
   // Get a brand by its ID
   async findOne(id: number): Promise<Brand> {
-    const brand = await this.brandsRepository.findOne({
-      where: { id },
-    });
-    if (!brand) {
-      throw new NotFoundException(`Brand with ID ${id} not found`);
+    try {
+      const brand = await this.brandsRepository.findOne({ where: { id } });
+      if (!brand) {
+        throw new NotFoundException(`Brand with ID ${id} not found`);
+      }
+      return brand;
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
     }
-    return brand;
   }
 
-  // Update a brand by its ID
-  async update(id: number, updateBrandDto: UpdateBrandDto): Promise<Brand> {
-    const brand = await this.findOne(id); // Check if the brand exists
-    Object.assign(brand, updateBrandDto); // Apply the updates
-    return await this.brandsRepository.save(brand); // Save the updated brand
-  }
-
-  // Remove a brand by its ID
+  // Delete a brand by its ID
   async remove(id: number): Promise<void> {
-    const brand = await this.findOne(id); // Check if the brand exists
-    await this.brandsRepository.remove(brand); // Remove the brand from the database
+    try {
+      const result = await this.brandsRepository.delete({ id });
+      if (!result.affected) {
+        throw new NotFoundException(`Brand with ID ${id} not found`);
+      }
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
+  }
+
+  // Update brand image
+  async updateBrandImage(id: number, path: string): Promise<Brand> {
+    try {
+      const brand = await this.brandsRepository.findOne({ where: { id } });
+      if (!brand) {
+        throw new NotFoundException(`Brand with ID ${id} not found`);
+      }
+      brand.imageUrl = path;
+      await this.brandsRepository.update(id, brand);
+      return brand;
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
   }
 }

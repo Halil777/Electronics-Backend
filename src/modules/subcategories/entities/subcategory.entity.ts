@@ -1,5 +1,5 @@
-import { Brand } from 'src/modules/brands/entities/brand.entity';
 import { Category } from 'src/modules/category/entities/category.entity';
+import { Segment } from 'src/modules/segment/entities/segment.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -35,6 +35,10 @@ export class Subcategory {
   @Column({ type: 'text', nullable: true })
   desc_en?: string;
 
+  // Foreign Key Column for category
+  @Column({ nullable: false })
+  category_id: number;
+
   // Establish a many-to-one relationship with the Category
   @ManyToOne(() => Category, (category) => category.subcategories, {
     nullable: false,
@@ -43,7 +47,6 @@ export class Subcategory {
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  // Establish a one-to-many relationship with the Brand
-  @OneToMany(() => Brand, (brand) => brand.subcategory)
-  brands: Brand[];
+  @OneToMany(() => Segment, (segment) => segment.subcategory)
+  segments: Segment[];
 }
