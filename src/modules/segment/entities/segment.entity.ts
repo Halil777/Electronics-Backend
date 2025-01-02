@@ -1,9 +1,11 @@
+import { Product } from 'src/modules/products/entities/product.entity';
 import { Subcategory } from 'src/modules/subcategories/entities/subcategory.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -33,10 +35,16 @@ export class Segment {
   @Column({ type: 'text', nullable: true })
   desc_en?: string;
 
+  @Column({ nullable: false })
+  subcategory_id: number;
+
   @ManyToOne(() => Subcategory, (subcategory) => subcategory.segments, {
     nullable: false,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'subcategory_id' })
   subcategory: Subcategory;
+
+  @OneToMany(() => Product, (product) => product.segment)
+  products: Product[];
 }

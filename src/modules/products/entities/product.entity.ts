@@ -1,16 +1,17 @@
-// src/modules/products/entities/product.entity.ts
 import { Brand } from 'src/modules/brands/entities/brand.entity';
 import { Category } from 'src/modules/category/entities/category.entity';
+import { Segment } from 'src/modules/segment/entities/segment.entity';
 import {
   Column,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
-@Entity()
+@Entity('products')
 export class Product {
   @PrimaryGeneratedColumn()
   id: number;
@@ -48,9 +49,6 @@ export class Product {
   @Column({ type: 'integer', default: 0 })
   stock: number;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
-  sku?: string;
-
   @Column({ type: 'boolean', default: true })
   is_active?: boolean;
 
@@ -66,12 +64,8 @@ export class Product {
   @Column({ type: 'float', nullable: true })
   depth?: number;
 
-  @Column({ type: 'jsonb', nullable: true })
-  images?: {
-    url: string;
-    alt_text?: string;
-    is_main?: boolean;
-  }[];
+  @Column({ type: 'simple-array', nullable: true })
+  images: string[];
 
   @Column({ type: 'text', nullable: true })
   size?: string;
@@ -79,11 +73,8 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   color?: string;
 
-  @Column({ type: 'text', array: true, nullable: true })
-  tags?: string[];
-
   @Column({ type: 'text', nullable: true })
-  video_url?: string;
+  tags?: string;
 
   @Column({ type: 'integer', default: 0 })
   views?: number;
@@ -100,7 +91,15 @@ export class Product {
   brand_id?: number;
 
   @ManyToMany(() => Category, (category) => category.products)
-  categories: Category[];
+  @JoinTable({ name: 'product_categories' })
+  categories?: Category[];
+
+  @ManyToOne(() => Segment, (segment) => segment.products, { nullable: true })
+  @JoinColumn({ name: 'segment_id' })
+  segment?: Segment;
+
+  @Column({ nullable: true })
+  segment_id?: number;
 
   // Meta-data
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

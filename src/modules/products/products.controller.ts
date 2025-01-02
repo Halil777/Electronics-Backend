@@ -11,6 +11,9 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFiles,
+  BadRequestException,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -24,8 +27,8 @@ import {
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { editFileName } from '../category/category.controller';
 import { Product } from './entities/product.entity';
+import { editFileName } from 'src/utils/editFile';
 
 @ApiTags('Products')
 @Controller('products')
@@ -33,105 +36,123 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new product' })
+  @ApiOperation({ summary: 'Create a new product with images' })
   @ApiResponse({
     status: 201,
     description: 'Product successfully created.',
     type: Product,
   })
-  @ApiResponse({ status: 400, description: 'Incorrect data.' })
+  @ApiResponse({ status: 400, description: 'Invalid data or files.' })
   @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      // 'files' is the name of the field in FormData
+    FilesInterceptor('images', 10, {
       storage: diskStorage({
-        destination: 'upload/products',
+        destination: './upload/products',
         filename: editFileName,
       }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return callback(
+            new BadRequestException(
+              'Only JPG, JPEG, PNG, and GIF files are allowed!',
+            ),
+            false,
+          );
+        }
+        callback(null, true);
+      },
     }),
   )
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() createProductDto: CreateProductDto,
-    @UploadedFiles() files?: Express.Multer.File[],
+    @UploadedFiles() images?: Express.Multer.File[],
   ) {
-    if (files && files.length > 0) {
-      const images = files.map((file) => ({ url: file.path }));
-      return this.productsService.create({ ...createProductDto, images });
-    }
-    return this.productsService.create(createProductDto);
+    return this.productsService.create(createProductDto, images);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get a list of all products' })
+  @ApiOperation({ summary: 'Get a list of all products with pagination' })
   @ApiQuery({
     name: 'page',
     required: false,
-    description: 'Page number for pagination',
+    description: 'Page number for pagination (default: 1)',
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of products per page',
+    description: 'Number of products per page (default: 10)',
   })
   @ApiResponse({
     status: 200,
-    description: 'List of products successfully received.',
+    description: 'List of products successfully retrieved.',
     type: [Product],
   })
-  async findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
     return this.productsService.findAll({ page, limit });
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID' })
-  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiParam({ name: 'id', description: 'Product ID', type: Number })
   @ApiResponse({
     status: 200,
     description: 'Product successfully found.',
     type: Product,
   })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  async findOne(@Param('id') id: number) {
-    return this.productsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findById(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update product data' })
-  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiOperation({ summary: 'Update product data and images' })
+  @ApiParam({ name: 'id', description: 'Product ID', type: Number })
   @ApiResponse({
     status: 200,
     description: 'Product successfully updated.',
     type: Product,
   })
+  @ApiResponse({ status: 400, description: 'Invalid data or files.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  @ApiResponse({ status: 400, description: 'Incorrect data.' })
   @UseInterceptors(
-    FilesInterceptor('files', 10, {
+    FilesInterceptor('images', 10, {
       storage: diskStorage({
-        destination: 'upload/products',
+        destination: './upload/products',
         filename: editFileName,
       }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          return callback(
+            new BadRequestException(
+              'Only JPG, JPEG, PNG, and GIF files are allowed!',
+            ),
+            false,
+          );
+        }
+        callback(null, true);
+      },
     }),
   )
   async update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
-    @UploadedFiles() files?: Express.Multer.File[],
+    @UploadedFiles() images?: Express.Multer.File[],
   ) {
-    if (files && files.length > 0) {
-      const images = files.map((file) => ({ url: file.path }));
-      return this.productsService.update(id, { ...updateProductDto, images });
-    }
-    return this.productsService.update(id, updateProductDto);
+    // Pass images array directly to the service method
+    return this.productsService.update(id, updateProductDto, images);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a product' })
-  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiParam({ name: 'id', description: 'Product ID', type: Number })
   @ApiResponse({ status: 204, description: 'Product successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: number) {
-    return this.productsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.productsService.remove(id);
+    return;
   }
 }

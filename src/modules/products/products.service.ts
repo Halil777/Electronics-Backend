@@ -1,15 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, In } from 'typeorm';
+import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
 import { Brand } from '../brands/entities/brand.entity';
 import { Category } from '../category/entities/category.entity';
+import { Segment } from '../segment/entities/segment.entity';
 
 @Injectable()
 export class ProductsService {
@@ -20,124 +17,135 @@ export class ProductsService {
     private readonly brandRepository: Repository<Brand>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Segment)
+    private readonly segmentRepository: Repository<Segment>,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    try {
-      const { brand_id, ...productData } = createProductDto;
-      let brand = null;
-      if (brand_id) {
-        brand = await this.brandRepository.findOne({ where: { id: brand_id } });
-        if (!brand) {
-          throw new NotFoundException(`Brand with ID ${brand_id} not found`);
-        }
-      }
+  /**
+   * Create a new product
+   */
+  async create(
+    createProductDto: CreateProductDto,
+    images?: Express.Multer.File[],
+  ): Promise<Product> {
+    const { brand_id, categories, segment_id, ...productData } =
+      createProductDto;
 
-      const product = this.productRepository.create(productData);
-      if (brand) {
-        product.brand = brand;
-      }
-      return await this.productRepository.save(product);
-    } catch (err) {
-      if (err instanceof NotFoundException) {
-        throw new NotFoundException(err.message);
-      }
-      throw new BadRequestException(err);
+    const product = this.productRepository.create(productData);
+
+    if (brand_id) product.brand = await this.findBrand(brand_id);
+    if (categories) product.categories = await this.findCategories(categories);
+    if (segment_id) product.segment = await this.findSegment(segment_id);
+
+    if (images?.length) {
+      const baseUrl = `${process.env.BASE_URL}/upload/products`;
+      product.images = images.map((file) => `${baseUrl}/${file.filename}`);
     }
+
+    return this.productRepository.save(product);
   }
 
-  async findAll(query?: {
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: Product[]; total: number; page: number; limit: number }> {
-    try {
-      const { page = 1, limit = 10 } = query || {};
-      const skip = (page - 1) * limit;
+  /**
+   * Retrieve all products with pagination
+   */
+  async findAll(query: {
+    page: number;
+    limit: number;
+  }): Promise<{ data: Product[]; total: number }> {
+    const { page, limit } = query;
+    const [products, total] = await this.productRepository.findAndCount({
+      relations: ['brand', 'categories', 'segment'],
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
-      const [products, total] = await this.productRepository.findAndCount({
-        skip,
-        take: limit,
-        relations: ['brand', 'categories'], // Add relations if necessary
-      });
-
-      return {
-        data: products,
-        total,
-        page,
-        limit,
-      };
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
+    return { data: products, total };
   }
 
-  async findOne(id: number): Promise<Product> {
-    try {
-      const product = await this.productRepository.findOne({
-        where: { id },
-        relations: ['brand', 'categories'], // Add relations if necessary
-      });
-      if (!product) {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-      return product;
-    } catch (err) {
-      if (err instanceof NotFoundException) {
-        throw new NotFoundException(err.message);
-      }
-      throw new BadRequestException(err);
+  /**
+   * Retrieve a single product by ID
+   */
+  async findById(id: number): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['brand', 'categories', 'segment'],
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    return product;
   }
 
+  /**
+   * Update an existing product
+   */
   async update(
     id: number,
     updateProductDto: UpdateProductDto,
+    images?: Express.Multer.File[],
   ): Promise<Product> {
-    try {
-      const { brand_id, ...productData } = updateProductDto;
-      const product = await this.productRepository.findOne({ where: { id } });
-      if (!product) {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-      let brand = null;
-      if (brand_id) {
-        brand = await this.brandRepository.findOne({ where: { id: brand_id } });
-        if (!brand) {
-          throw new NotFoundException(`Brand with ID ${brand_id} not found`);
-        }
-      }
+    const product = await this.findById(id);
 
-      Object.assign(product, productData);
-      if (brand) {
-        product.brand = brand;
-      }
-      return await this.productRepository.save(product);
-    } catch (err) {
-      if (err instanceof NotFoundException) {
-        throw new NotFoundException(err.message);
-      }
-      throw new BadRequestException(err);
+    const { brand_id, categories, segment_id, ...productData } =
+      updateProductDto;
+
+    if (brand_id) product.brand = await this.findBrand(brand_id);
+    if (categories) product.categories = await this.findCategories(categories);
+    if (segment_id) product.segment = await this.findSegment(segment_id);
+
+    if (images?.length) {
+      const baseUrl = `${process.env.BASE_URL}/upload/products`;
+      product.images = [
+        ...(product.images || []),
+        ...images.map((file) => `${baseUrl}/${file.filename}`),
+      ];
     }
+
+    Object.assign(product, productData);
+    return this.productRepository.save(product);
   }
 
+  /**
+   * Delete a product
+   */
   async remove(id: number): Promise<void> {
-    try {
-      const result = await this.productRepository.delete({ id });
-      if (!result.affected) {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-    } catch (err) {
-      if (err instanceof NotFoundException) {
-        throw new NotFoundException(err.message);
-      }
-      throw new BadRequestException(err);
+    const result = await this.productRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
     }
   }
-}
 
-export enum ProductStatus {
-  DRAFT = 'draft',
-  PENDING_APPROVAL = 'pending_approval',
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
+  /**
+   * Helper method to find a brand by ID
+   */
+  private async findBrand(id: number): Promise<Brand> {
+    const brand = await this.brandRepository.findOne({ where: { id } });
+    if (!brand) throw new NotFoundException(`Brand with ID ${id} not found`);
+    return brand;
+  }
+
+  /**
+   * Helper method to find categories by ID(s)
+   */
+  private async findCategories(ids: number | number[]): Promise<Category[]> {
+    const categories = await this.categoryRepository.find({
+      where: { id: Array.isArray(ids) ? In(ids) : ids },
+    });
+    if (!categories.length) {
+      throw new NotFoundException(`Category with ID(s) ${ids} not found`);
+    }
+    return categories;
+  }
+
+  /**
+   * Helper method to find a segment by ID
+   */
+  private async findSegment(id: number): Promise<Segment> {
+    const segment = await this.segmentRepository.findOne({ where: { id } });
+    if (!segment) {
+      throw new NotFoundException(`Segment with ID ${id} not found`);
+    }
+    return segment;
+  }
 }
