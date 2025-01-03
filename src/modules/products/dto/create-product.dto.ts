@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  IsArray,
-  IsInt,
-} from 'class-validator';
+import { IsString, IsOptional, IsArray } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -43,7 +37,6 @@ export class CreateProductDto {
   @IsOptional()
   readonly stock: number;
 
-  @IsBoolean()
   @IsOptional()
   readonly is_active?: boolean;
 
@@ -75,7 +68,6 @@ export class CreateProductDto {
   @IsOptional()
   readonly tags?: string;
 
-  @IsInt()
   @IsOptional()
   readonly views?: number;
 
@@ -83,16 +75,13 @@ export class CreateProductDto {
   readonly rating?: number;
 
   // Relationships
-  @IsInt()
   @IsOptional()
   readonly brand_id?: number;
 
   @IsArray()
   @IsOptional()
-  @IsInt({ each: true }) // Проверяем, что каждый элемент — это ID категории
   readonly categories?: number[];
 
-  @IsInt()
   @IsOptional()
   readonly segment_id?: number;
 }
