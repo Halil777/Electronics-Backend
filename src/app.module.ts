@@ -30,6 +30,8 @@ import { Subcategory } from './modules/subcategories/entities/subcategory.entity
 import { Brand } from './modules/brands/entities/brand.entity';
 import { Product } from './modules/products/entities/product.entity';
 import { Segment } from './modules/segment/entities/segment.entity';
+import { BannerModule } from './modules/banner/banner.module';
+import { Banner } from './modules/banner/entities/banner.entity';
 
 @Module({
   imports: [
@@ -76,6 +78,7 @@ import { Segment } from './modules/segment/entities/segment.entity';
         Brand,
         Product,
         Segment,
+        Banner,
       ],
       synchronize: true, // Automatically sync schema; turn off in production
       logging: true,
@@ -93,6 +96,7 @@ import { Segment } from './modules/segment/entities/segment.entity';
     BrandsModule,
     ProductsModule,
     SegmentModule,
+    BannerModule,
   ],
   controllers: [],
   providers: [],
