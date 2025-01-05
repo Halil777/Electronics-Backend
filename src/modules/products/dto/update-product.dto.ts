@@ -1,5 +1,5 @@
 // update-product.dto.ts
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class UpdateProductDto {
   @IsString()
@@ -42,7 +42,7 @@ export class UpdateProductDto {
   readonly stock?: number;
 
   @IsOptional()
-  readonly is_active?: boolean;
+  readonly is_active?: string;
 
   @IsOptional()
   readonly weight?: number;
@@ -80,7 +80,6 @@ export class UpdateProductDto {
   @IsOptional()
   readonly segment_id?: number;
 
-  @IsArray()
   @IsOptional()
   readonly categories?: number[];
 }

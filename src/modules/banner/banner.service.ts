@@ -12,17 +12,62 @@ import { UpdateBannerDto } from './dto/update-banner.dto';
 @Injectable()
 export class BannerService {
   constructor(
-    @InjectRepository(Banner) private bannerRepository: Repository<Banner>,
+    @InjectRepository(Banner)
+    private readonly bannerRepository: Repository<Banner>,
   ) {}
 
-  // Create a new banner
-  async createBanner(createBannerDto: CreateBannerDto): Promise<Banner> {
+  // Add a new banner with an image
+  async addBanner(image: string, body: CreateBannerDto): Promise<Banner> {
     try {
-      const banner = this.bannerRepository.create(createBannerDto);
+      const banner = new Banner();
+      banner.imageUrl = image; // Use the imageUrl from the request
+      banner.desc_tm = body.desc_tm;
+      banner.desc_ru = body.desc_ru;
+      banner.desc_en = body.desc_en;
+      banner.title_tm = body.title_tm;
+      banner.title_ru = body.title_ru;
+      banner.title_en = body.title_en;
       return await this.bannerRepository.save(banner);
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException(error);
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
+  }
+
+  // Update banner
+  async updateBanner(id: number, body: UpdateBannerDto): Promise<Banner> {
+    try {
+      const banner = await this.bannerRepository.findOne({ where: { id } });
+      if (!banner) {
+        throw new NotFoundException(`Banner with ID ${id} not found`);
+      }
+
+      banner.desc_tm = body.desc_tm || banner.desc_tm;
+      banner.desc_ru = body.desc_ru || banner.desc_ru;
+      banner.desc_en = body.desc_en || banner.desc_en;
+      banner.title_tm = body.title_tm || banner.title_tm;
+      banner.title_ru = body.title_ru || banner.title_ru;
+      banner.title_en = body.title_en || banner.title_en;
+
+      await this.bannerRepository.update(id, banner);
+      return banner;
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
+  }
+
+  // Get all banners
+  async getAllBanners(): Promise<Banner[]> {
+    try {
+      const banners = await this.bannerRepository.find();
+      return banners.map((banner) => ({
+        ...banner,
+        imageUrl: process.env.BASE_URL + '/' + banner.imageUrl,
+      }));
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
     }
   }
 
@@ -34,35 +79,22 @@ export class BannerService {
         throw new NotFoundException(`Banner with ID ${id} not found`);
       }
       return banner;
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException(error);
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
     }
   }
 
-  // Update a banner
-  async updateBanner(
-    id: number,
-    updateBannerDto: UpdateBannerDto,
-  ): Promise<Banner> {
+  // Delete a banner
+  async deleteBanner(id: number): Promise<void> {
     try {
-      const banner = await this.bannerRepository.findOne({ where: { id } });
-      if (!banner) {
+      const result = await this.bannerRepository.delete({ id });
+      if (!result.affected) {
         throw new NotFoundException(`Banner with ID ${id} not found`);
       }
-      // if exists update banner with data from updateBannerDto
-      banner.title_tm = updateBannerDto.title_tm || banner.title_tm;
-      banner.title_en = updateBannerDto.title_en || banner.title_en;
-      banner.title_ru = updateBannerDto.title_ru || banner.title_ru;
-      banner.desc_tm = updateBannerDto.desc_tm || banner.desc_tm;
-      banner.desc_en = updateBannerDto.desc_en || banner.desc_en;
-      banner.desc_ru = updateBannerDto.desc_ru || banner.desc_ru;
-
-      await this.bannerRepository.update(id, banner);
-      return banner;
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException(error);
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
     }
   }
 
@@ -77,35 +109,9 @@ export class BannerService {
       banner.imageUrl = path;
       await this.bannerRepository.update(id, banner);
       return banner;
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException(error);
-    }
-  }
-
-  // Delete a banner
-  async deleteBanner(id: number): Promise<void> {
-    try {
-      const result = await this.bannerRepository.delete({ id });
-      if (!result.affected) {
-        throw new NotFoundException(`Banner with ID ${id} not found`);
-      }
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException(error);
-    }
-  }
-  // Get all banners
-  async getAllBanners(): Promise<Banner[]> {
-    try {
-      const banners = await this.bannerRepository.find();
-      return banners.map((banner) => ({
-        ...banner,
-        imageUrl: process.env.BASE_URL + '/' + banner.imageUrl,
-      }));
-    } catch (error) {
-      console.error(error);
-      throw new BadRequestException(error);
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
     }
   }
 }

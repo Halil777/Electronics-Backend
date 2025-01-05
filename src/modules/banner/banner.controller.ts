@@ -8,21 +8,20 @@ import {
   UploadedFile,
   BadRequestException,
   Delete,
-  Put,
-  ParseIntPipe,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
-import { editFileName } from 'src/utils/editFile';
+import { editFileName } from '../category/category.controller';
 
 @Controller('banner')
 export class BannerController {
   constructor(private readonly bannerService: BannerService) {}
 
-  // Create banner with image
+  // Create banner with an image
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
@@ -39,10 +38,7 @@ export class BannerController {
     if (!file) {
       throw new BadRequestException('No image file provided');
     }
-    return this.bannerService.createBanner({
-      ...createBannerDto,
-      imageUrl: file.path,
-    });
+    return this.bannerService.addBanner(file.path, createBannerDto);
   }
 
   // Get all banners
@@ -51,14 +47,8 @@ export class BannerController {
     return this.bannerService.getAllBanners();
   }
 
-  // Get a banner by ID
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.bannerService.getBanner(id);
-  }
-
   // Update banner with a new image (optional)
-  @Put(':id')
+  @Patch(':id')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -68,19 +58,20 @@ export class BannerController {
     }),
   )
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateBannerDto: UpdateBannerDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
-      return await this.bannerService.updateBannerImage(id, file.path);
+      return await this.bannerService.updateBannerImage(+id, file.path);
     } else {
-      return await this.bannerService.updateBanner(id, updateBannerDto);
+      return await this.bannerService.updateBanner(+id, updateBannerDto);
     }
   }
+
   // Delete banner
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.bannerService.deleteBanner(id);
+  remove(@Param('id') id: string) {
+    return this.bannerService.deleteBanner(+id);
   }
 }
