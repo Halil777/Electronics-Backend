@@ -7,8 +7,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -40,8 +38,8 @@ export class Category {
   @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
   subcategories: Subcategory[];
 
-  @ManyToMany(() => Product, (product) => product.categories)
-  @JoinTable({ name: 'product_categories' })
+  // Update the relationship with Product to OneToMany
+  @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 
   @CreateDateColumn()

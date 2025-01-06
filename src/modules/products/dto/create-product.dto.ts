@@ -1,24 +1,21 @@
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class CreateProductDto {
-  @IsString()
+  @IsOptional()
   readonly title_tm: string;
 
-  @IsString()
+  @IsOptional()
   readonly title_ru: string;
 
-  @IsString()
+  @IsOptional()
   readonly title_en: string;
 
-  @IsString()
   @IsOptional()
   readonly desc_tm?: string;
 
-  @IsString()
   @IsOptional()
   readonly desc_ru?: string;
 
-  @IsString()
   @IsOptional()
   readonly desc_en?: string;
 
@@ -52,19 +49,15 @@ export class CreateProductDto {
   @IsOptional()
   readonly depth?: number;
 
-  @IsArray()
   @IsOptional()
   readonly images?: string[];
 
-  @IsString()
   @IsOptional()
   readonly size?: string;
 
-  @IsString()
   @IsOptional()
   readonly color?: string;
 
-  @IsString()
   @IsOptional()
   readonly tags?: string;
 
@@ -78,9 +71,9 @@ export class CreateProductDto {
   @IsOptional()
   readonly brand_id?: number;
 
-  @IsArray()
+  // Update category relationship to only one category (not an array)
   @IsOptional()
-  readonly categories?: number[];
+  readonly category_id?: number; // Only one category per product now
 
   @IsOptional()
   readonly segment_id?: number;

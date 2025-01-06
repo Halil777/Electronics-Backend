@@ -1,12 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity('banners')
+@Entity()
 export class Banner {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  imageUrl: string;
+  imageUrl?: string;
 
   @Column({ nullable: true })
   title_tm?: string;
@@ -25,4 +31,10 @@ export class Banner {
 
   @Column({ nullable: true, type: 'text' })
   desc_ru?: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

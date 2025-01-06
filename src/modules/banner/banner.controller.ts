@@ -15,7 +15,7 @@ import { diskStorage } from 'multer';
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
-import { editFileName } from '../category/category.controller';
+import { extname } from 'path';
 
 @Controller('banner')
 export class BannerController {
@@ -75,3 +75,14 @@ export class BannerController {
     return this.bannerService.deleteBanner(+id);
   }
 }
+
+export const editFileName = (req, file, callback) => {
+  console.log(file.originalname);
+  const name = file.originalname.split('.')[0];
+  const fileExtName = extname(file.originalname);
+  const randomName = Array(4)
+    .fill(null)
+    .map(() => Math.round(Math.random() * 16).toString(16))
+    .join('');
+  callback(null, `${name}-${randomName}-${file.originalname}`);
+};

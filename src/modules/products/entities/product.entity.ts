@@ -7,8 +7,6 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 
 @Entity('products')
@@ -90,9 +88,14 @@ export class Product {
   @Column({ nullable: true })
   brand_id?: number;
 
-  @ManyToMany(() => Category, (category) => category.products)
-  @JoinTable({ name: 'product_categories' })
-  categories?: Category[];
+  @ManyToOne(() => Category, (category) => category.products, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'category_id' })
+  category?: Category;
+
+  @Column({ nullable: true })
+  category_id?: number;
 
   @ManyToOne(() => Segment, (segment) => segment.products, { nullable: true })
   @JoinColumn({ name: 'segment_id' })

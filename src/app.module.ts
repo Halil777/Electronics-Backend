@@ -17,6 +17,7 @@ import { SubcategoriesModule } from './modules/subcategories/subcategories.modul
 import { BrandsModule } from './modules/brands/brands.module';
 import { ProductsModule } from './modules/products/products.module';
 import { SegmentModule } from './modules/segment/segment.module';
+import { BannerModule } from './modules/banner/banner.module';
 
 // Entities
 import { Category } from './modules/category/entities/category.entity';
@@ -30,7 +31,6 @@ import { Subcategory } from './modules/subcategories/entities/subcategory.entity
 import { Brand } from './modules/brands/entities/brand.entity';
 import { Product } from './modules/products/entities/product.entity';
 import { Segment } from './modules/segment/entities/segment.entity';
-import { BannerModule } from './modules/banner/banner.module';
 import { Banner } from './modules/banner/entities/banner.entity';
 
 @Module({

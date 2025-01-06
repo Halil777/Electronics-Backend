@@ -1,28 +1,21 @@
-// update-product.dto.ts
-import { IsString, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateProductDto {
-  @IsString()
   @IsOptional()
   readonly title_tm?: string;
 
-  @IsString()
   @IsOptional()
   readonly title_ru?: string;
 
-  @IsString()
   @IsOptional()
   readonly title_en?: string;
 
-  @IsString()
   @IsOptional()
   readonly desc_tm?: string;
 
-  @IsString()
   @IsOptional()
   readonly desc_ru?: string;
 
-  @IsString()
   @IsOptional()
   readonly desc_en?: string;
 
@@ -42,7 +35,7 @@ export class UpdateProductDto {
   readonly stock?: number;
 
   @IsOptional()
-  readonly is_active?: string;
+  readonly is_active?: boolean;
 
   @IsOptional()
   readonly weight?: number;
@@ -59,11 +52,9 @@ export class UpdateProductDto {
   @IsOptional()
   readonly size?: string;
 
-  @IsString()
   @IsOptional()
   readonly color?: string;
 
-  @IsString()
   @IsOptional()
   readonly tags?: string;
 
@@ -81,5 +72,5 @@ export class UpdateProductDto {
   readonly segment_id?: number;
 
   @IsOptional()
-  readonly categories?: number[];
+  readonly category_id?: number; // Updated to single category_id, not an array
 }

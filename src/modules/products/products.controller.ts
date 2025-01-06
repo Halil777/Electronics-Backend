@@ -141,7 +141,6 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() images?: Express.Multer.File[],
   ) {
-    // Pass images array directly to the service method
     return this.productsService.update(id, updateProductDto, images);
   }
 

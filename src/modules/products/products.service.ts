@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -28,13 +28,13 @@ export class ProductsService {
     createProductDto: CreateProductDto,
     images?: Express.Multer.File[],
   ): Promise<Product> {
-    const { brand_id, categories, segment_id, ...productData } =
+    const { brand_id, category_id, segment_id, ...productData } =
       createProductDto;
 
     const product = this.productRepository.create(productData);
 
     if (brand_id) product.brand = await this.findBrand(brand_id);
-    if (categories) product.categories = await this.findCategories(categories);
+    if (category_id) product.category = await this.findCategory(category_id); // Single category
     if (segment_id) product.segment = await this.findSegment(segment_id);
 
     if (images?.length) {
@@ -54,7 +54,7 @@ export class ProductsService {
   }): Promise<{ data: Product[]; total: number }> {
     const { page, limit } = query;
     const [products, total] = await this.productRepository.findAndCount({
-      relations: ['brand', 'categories', 'segment'],
+      relations: ['brand', 'category', 'segment'], // Updated to 'category'
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -68,7 +68,7 @@ export class ProductsService {
   async findById(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['brand', 'categories', 'segment'],
+      relations: ['brand', 'category', 'segment'], // Updated to 'category'
     });
 
     if (!product) {
@@ -87,11 +87,11 @@ export class ProductsService {
   ): Promise<Product> {
     const product = await this.findById(id);
 
-    const { brand_id, categories, segment_id, ...productData } =
+    const { brand_id, category_id, segment_id, ...productData } =
       updateProductDto;
 
     if (brand_id) product.brand = await this.findBrand(brand_id);
-    if (categories) product.categories = await this.findCategories(categories);
+    if (category_id) product.category = await this.findCategory(category_id); // Single category
     if (segment_id) product.segment = await this.findSegment(segment_id);
 
     if (images?.length) {
@@ -126,16 +126,13 @@ export class ProductsService {
   }
 
   /**
-   * Helper method to find categories by ID(s)
+   * Helper method to find a category by ID
    */
-  private async findCategories(ids: number | number[]): Promise<Category[]> {
-    const categories = await this.categoryRepository.find({
-      where: { id: Array.isArray(ids) ? In(ids) : ids },
-    });
-    if (!categories.length) {
-      throw new NotFoundException(`Category with ID(s) ${ids} not found`);
-    }
-    return categories;
+  private async findCategory(id: number): Promise<Category> {
+    const category = await this.categoryRepository.findOne({ where: { id } });
+    if (!category)
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    return category;
   }
 
   /**
