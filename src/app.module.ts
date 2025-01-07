@@ -32,6 +32,12 @@ import { Brand } from './modules/brands/entities/brand.entity';
 import { Product } from './modules/products/entities/product.entity';
 import { Segment } from './modules/segment/entities/segment.entity';
 import { Banner } from './modules/banner/entities/banner.entity';
+import { AuctionModule } from './modules/auction/auction.module';
+import { Auction } from './modules/auction/entities/auction.entity';
+import { AuctionNotificationModule } from './modules/auction_notification/auction_notification.module';
+import { AuctionNotification } from './modules/auction_notification/entities/auction_notification.entity';
+import { PartnersModule } from './modules/partners/partners.module';
+import { Partner } from './modules/partners/entities/partner.entity';
 
 @Module({
   imports: [
@@ -79,6 +85,9 @@ import { Banner } from './modules/banner/entities/banner.entity';
         Product,
         Segment,
         Banner,
+        Auction,
+        AuctionNotification,
+        Partner,
       ],
       synchronize: true, // Automatically sync schema; turn off in production
       logging: true,
@@ -97,6 +106,9 @@ import { Banner } from './modules/banner/entities/banner.entity';
     ProductsModule,
     SegmentModule,
     BannerModule,
+    AuctionModule,
+    AuctionNotificationModule,
+    PartnersModule,
   ],
   controllers: [],
   providers: [],
