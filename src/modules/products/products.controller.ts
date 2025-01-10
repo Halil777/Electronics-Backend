@@ -94,6 +94,70 @@ export class ProductsController {
     return this.productsService.findAll({ page, limit });
   }
 
+  @Get('client/filters')
+  async getFilters() {
+    return this.productsService.getFilters();
+  }
+
+  @Get('client/products')
+  @ApiOperation({ summary: 'Get a list of all products with pagination' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of products per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'categoryId',
+    required: false,
+    description: 'Category id (default: undefined)',
+  })
+  @ApiQuery({
+    name: 'subcategoryId',
+    required: false,
+    description: 'Sub Category id (default: undefined)',
+  })
+  @ApiQuery({
+    name: 'segmentId',
+    required: false,
+    description: 'Segment id (default: undefined)',
+  })
+  @ApiQuery({
+    name: 'brandId',
+    required: false,
+    description: 'Brand id (default: undefined)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of products successfully retrieved.',
+    type: [Product],
+  })
+  async clientProducts(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('categoryId')
+    categoryId?: number | undefined,
+    @Query('subcategoryId')
+    subcategoryId?: number | undefined,
+    @Query('segmentId')
+    segmentId?: number | undefined,
+    @Query('brandId')
+    brandId?: number | undefined,
+  ) {
+    return this.productsService.findAll({
+      page,
+      limit,
+      categoryId,
+      subcategoryId,
+      segmentId,
+      brandId,
+    });
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID' })
   @ApiParam({ name: 'id', description: 'Product ID', type: Number })

@@ -8,6 +8,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import { Product } from '../../products/entities/product.entity';
 
 @Entity()
 export class Subcategory {
@@ -38,6 +39,9 @@ export class Subcategory {
   // Foreign Key Column for category
   @Column({ nullable: false })
   category_id: number;
+
+  @OneToMany(() => Product, (product) => product.category)
+  products: Product[];
 
   // Establish a many-to-one relationship with the Category
   @ManyToOne(() => Category, (category) => category.subcategories, {

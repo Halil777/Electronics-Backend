@@ -75,6 +75,10 @@ export class CreateProductDto {
   @IsOptional()
   readonly category_id?: number; // Only one category per product now
 
+  // Update category relationship to only one category (not an array)
+  @IsOptional()
+  readonly subcategory_id?: number; // Only one category per product now
+
   @IsOptional()
   readonly segment_id?: number;
 }

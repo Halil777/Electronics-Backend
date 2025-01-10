@@ -38,6 +38,8 @@ import { AuctionNotificationModule } from './modules/auction_notification/auctio
 import { AuctionNotification } from './modules/auction_notification/entities/auction_notification.entity';
 import { PartnersModule } from './modules/partners/partners.module';
 import { Partner } from './modules/partners/entities/partner.entity';
+import { PropertiesModule } from './modules/properties/properties.module';
+import { Property } from './modules/properties/entities/property.entity';
 
 @Module({
   imports: [
@@ -88,6 +90,7 @@ import { Partner } from './modules/partners/entities/partner.entity';
         Auction,
         AuctionNotification,
         Partner,
+        Property,
       ],
       synchronize: true, // Automatically sync schema; turn off in production
       logging: true,
@@ -109,6 +112,7 @@ import { Partner } from './modules/partners/entities/partner.entity';
     AuctionModule,
     AuctionNotificationModule,
     PartnersModule,
+    PropertiesModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,3 @@
-import { Product } from 'src/modules/products/entities/product.entity';
 import { Subcategory } from 'src/modules/subcategories/entities/subcategory.entity';
 import {
   Entity,
@@ -39,8 +38,6 @@ export class Category {
   subcategories: Subcategory[];
 
   // Update the relationship with Product to OneToMany
-  @OneToMany(() => Product, (product) => product.category)
-  products: Product[];
 
   @CreateDateColumn()
   createdAt: Date;

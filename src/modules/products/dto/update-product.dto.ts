@@ -73,4 +73,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   readonly category_id?: number; // Updated to single category_id, not an array
+
+  @IsOptional()
+  readonly subcategory_id?: number; // Updated to single category_id, not an array
 }

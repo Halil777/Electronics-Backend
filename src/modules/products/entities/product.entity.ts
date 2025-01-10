@@ -1,13 +1,15 @@
 import { Brand } from 'src/modules/brands/entities/brand.entity';
-import { Category } from 'src/modules/category/entities/category.entity';
 import { Segment } from 'src/modules/segment/entities/segment.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Subcategory } from '../../subcategories/entities/subcategory.entity';
+import { Property } from '../../properties/entities/property.entity';
 
 @Entity('products')
 export class Product {
@@ -88,11 +90,11 @@ export class Product {
   @Column({ nullable: true })
   brand_id?: number;
 
-  @ManyToOne(() => Category, (category) => category.products, {
+  @ManyToOne(() => Subcategory, (category) => category.products, {
     nullable: true,
   })
   @JoinColumn({ name: 'category_id' })
-  category?: Category;
+  category?: Subcategory;
 
   @Column({ nullable: true })
   category_id?: number;
@@ -100,6 +102,9 @@ export class Product {
   @ManyToOne(() => Segment, (segment) => segment.products, { nullable: true })
   @JoinColumn({ name: 'segment_id' })
   segment?: Segment;
+
+  @OneToMany(() => Property, (property) => property.product)
+  properties?: Property[];
 
   @Column({ nullable: true })
   segment_id?: number;
