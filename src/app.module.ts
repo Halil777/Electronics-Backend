@@ -40,6 +40,7 @@ import { PartnersModule } from './modules/partners/partners.module';
 import { Partner } from './modules/partners/entities/partner.entity';
 import { PropertiesModule } from './modules/properties/properties.module';
 import { Property } from './modules/properties/entities/property.entity';
+import { JwtTokenModule } from './modules/jwt/jwt.module';
 
 @Module({
   imports: [
@@ -93,7 +94,7 @@ import { Property } from './modules/properties/entities/property.entity';
         Property,
       ],
       synchronize: true, // Automatically sync schema; turn off in production
-      logging: true,
+      logging: false,
     }),
 
     // Modules
@@ -113,6 +114,7 @@ import { Property } from './modules/properties/entities/property.entity';
     AuctionNotificationModule,
     PartnersModule,
     PropertiesModule,
+    JwtTokenModule,
   ],
   controllers: [],
   providers: [],

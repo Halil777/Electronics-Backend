@@ -8,20 +8,20 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { JwtTokenService } from '../jwt/jwt.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtTokenService: JwtTokenService,
   ) {}
 
   // Add a new user with a profile image
-  async addUser(image: string | null, body: CreateUserDto): Promise<User> {
+  async addUser(image: string | null, body: CreateUserDto): Promise<any> {
     try {
       const user = new User();
-      user.id = uuidv4(); // Generate UUID
       user.firstName = body.firstName;
       user.lastName = body.lastName;
       user.email = body.email;
@@ -29,15 +29,30 @@ export class UsersService {
       user.password = body.password;
       user.profileImage = image;
 
-      return await this.userRepository.save(user);
+      const result = await this.userRepository.save(user);
+      const token = await this.jwtTokenService.generateToken({
+        id: result.id,
+      });
+      return {
+        ...result,
+        otp: Math.random().toString().substring(2, 6),
+        token: token,
+      };
     } catch (err) {
       console.error(err);
-      throw new BadRequestException('Failed to create user');
+      throw new BadRequestException(err.message);
     }
   }
 
+  async verifyOtp(userId: number): Promise<any> {
+    const user = await this.userRepository.update(userId, {
+      is_confirmed: true,
+    });
+    return user;
+  }
+
   // Update a user's data
-  async updateUser(id: string, body: UpdateUserDto): Promise<User> {
+  async updateUser(id: number, body: UpdateUserDto): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
@@ -75,7 +90,7 @@ export class UsersService {
   }
 
   // Delete a user by ID
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: number): Promise<void> {
     try {
       const result = await this.userRepository.delete({ id });
       if (!result.affected) {
@@ -88,7 +103,7 @@ export class UsersService {
   }
 
   // Update a user's profile image
-  async updateProfileImage(id: string, path: string): Promise<User> {
+  async updateProfileImage(id: number, path: string): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
@@ -105,7 +120,7 @@ export class UsersService {
   }
 
   // Get a user by ID with formatted profile image URL
-  async findOne(id: string): Promise<User> {
+  async findOne(id: number): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
@@ -117,6 +132,32 @@ export class UsersService {
       }
 
       return user;
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException('Failed to retrieve user');
+    }
+  }
+  async login(phoneNumber: string, password: string): Promise<any> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { phoneNumber: phoneNumber, password: password },
+      });
+      if (!user) {
+        throw new NotFoundException(`User with ID ${phoneNumber} not found`);
+      }
+
+      if (user.profileImage) {
+        user.profileImage = `${process.env.BASE_URL}/${user.profileImage}`;
+      }
+
+      const token = await this.jwtTokenService.generateToken({
+        id: user.id,
+      });
+
+      return {
+        ...user,
+        token,
+      };
     } catch (err) {
       console.error(err);
       throw new BadRequestException('Failed to retrieve user');

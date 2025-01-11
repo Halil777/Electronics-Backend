@@ -28,16 +28,16 @@ export class CreateUserDto {
   phoneNumber?: string;
 
   @ApiPropertyOptional({
+    example: 'true',
+    description: 'Bildirish almalymy',
+  })
+  @IsOptional()
+  isNotify?: boolean | false;
+
+  @ApiPropertyOptional({
     example: 'securePassword123',
     description: 'Password for the user account',
   })
   @IsOptional()
   password?: string;
-
-  @ApiPropertyOptional({
-    example: 'https://example.com/images/profile.jpg',
-    description: 'Profile image URL of the user',
-  })
-  @IsOptional()
-  profileImage?: string;
 }

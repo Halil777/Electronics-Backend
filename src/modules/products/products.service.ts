@@ -34,15 +34,18 @@ export class ProductsService {
     createProductDto: CreateProductDto,
     images?: Express.Multer.File[],
   ): Promise<Product> {
-    const { brand_id, category_id, segment_id, ...productData } =
+    const { brand_id, segment_id, subcategory_id, ...productData } =
       createProductDto;
 
     const product = this.productRepository.create(productData);
 
     if (brand_id) product.brand = await this.findBrand(brand_id);
-    if (category_id) product.category = await this.findCategory(category_id); // Single category
+    if (subcategory_id)
+      product.category = await this.findCategory(subcategory_id); // Single category
     if (segment_id) product.segment = await this.findSegment(segment_id);
 
+    console.log(product.category);
+    console.log(subcategory_id);
     if (images?.length) {
       const baseUrl = `${process.env.BASE_URL}/upload/products`;
       product.images = images.map((file) => `${baseUrl}/${file.filename}`);
@@ -89,6 +92,8 @@ export class ProductsService {
       });
     }
     const where = [];
+
+    console.log(categories);
 
     if (categories.length > 0) {
       where.push({
@@ -192,6 +197,7 @@ export class ProductsService {
    * Helper method to find a category by ID
    */
   private async findCategory(id: number): Promise<Subcategory> {
+    console.log(id);
     const category = await this.categoryRepository.findOne({ where: { id } });
     if (!category)
       throw new NotFoundException(`Category with ID ${id} not found`);

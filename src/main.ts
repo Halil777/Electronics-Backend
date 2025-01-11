@@ -11,14 +11,13 @@ async function bootstrap() {
     .setTitle('Electronics')
     .setDescription('Electronics Api')
     .setVersion('0.1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-      },
-      'access-token',
-    )
+    .addServer('http://localhost:3000')
+    .addServer('https://elektronika.alemtilsimat.com/api')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      in: 'header',
+    })
     .addTag('Electronics')
     .build();
 
