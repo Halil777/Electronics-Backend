@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsOptional, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSubcategoryDto {
@@ -6,24 +6,21 @@ export class CreateSubcategoryDto {
     description: 'The title of the subcategory in Turkmen.',
     example: 'Elektronika',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   title_tm: string;
 
   @ApiProperty({
     description: 'The title of the subcategory in Russian.',
     example: 'Электроника',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   title_ru: string;
 
   @ApiProperty({
     description: 'The title of the subcategory in English.',
     example: 'Electronics',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   title_en: string;
 
   @ApiProperty({
@@ -32,7 +29,6 @@ export class CreateSubcategoryDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   imageUrl?: string;
 
   @ApiProperty({
@@ -41,7 +37,6 @@ export class CreateSubcategoryDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   desc_tm?: string;
 
   @ApiProperty({
@@ -50,7 +45,6 @@ export class CreateSubcategoryDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   desc_ru?: string;
 
   @ApiProperty({
@@ -59,7 +53,6 @@ export class CreateSubcategoryDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   desc_en?: string;
 
   @ApiProperty({
