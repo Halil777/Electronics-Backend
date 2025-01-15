@@ -1,32 +1,27 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class CreateCategoryDto {
-  @IsString()
+  @IsOptional()
   title_tm: string;
 
-  @IsString()
+  @IsOptional()
   title_ru: string;
 
-  @IsString()
+  @IsOptional()
   title_en: string;
 
   @IsOptional()
-  @IsString()
   desc_tm?: string;
 
   @IsOptional()
-  @IsString()
   desc_ru?: string;
 
   @IsOptional()
-  @IsString()
   desc_en?: string;
 
   @IsOptional()
-  @IsString()
   imageUrl?: string;
 
   @IsOptional()
-  @IsString()
   filePath?: string;
 }

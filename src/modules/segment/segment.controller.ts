@@ -14,8 +14,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { SegmentService } from './segment.service';
 import { CreateSegmentDto } from './dto/create-segment.dto';
-import { UpdateSegmentDto } from './dto/update-segment.dto';
 import { editFileName } from '../category/category.controller';
+import { UpdateSegmentDto } from './dto/update-segment.dto';
 
 @Controller('segment')
 export class SegmentController {
@@ -62,7 +62,11 @@ export class SegmentController {
     if (file) {
       return await this.segmentService.updateSegmentImage(+id, file.path);
     } else {
-      return await this.segmentService.updateSegment(+id, updateSegmentDto);
+      return await this.segmentService.updateSegment(
+        +id,
+        updateSegmentDto,
+        file,
+      );
     }
   }
 

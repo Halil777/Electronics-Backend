@@ -38,7 +38,7 @@ export class Auction {
   @Column({ type: 'timestamp' })
   auction_end: Date;
 
-  @Column({ type: 'varchar', length: 20, default: 'pending' }) // You can use ENUM for status
+  @Column({ type: 'varchar', length: 20, default: 'pending' })
   status: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 1 })

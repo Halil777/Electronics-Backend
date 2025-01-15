@@ -65,13 +65,27 @@ export class SegmentService {
     try {
       const segment = await this.segmentRepository.findOne({
         where: { id },
+        relations: ['subcategory'],
       });
       if (!segment) {
         throw new NotFoundException(`Segment with ID ${id} not found`);
       }
+
       let image = segment.imageUrl;
       if (file) {
         image = file.path;
+      }
+
+      if (body.subcategory_id) {
+        const subcategory = await this.subcategoryRepository.findOne({
+          where: { id: body.subcategory_id },
+        });
+        if (!subcategory) {
+          throw new NotFoundException(
+            `Subcategory with id ${body.subcategory_id} not found`,
+          );
+        }
+        segment.subcategory = subcategory;
       }
 
       segment.title_en = body.title_en || segment.title_en;
@@ -82,7 +96,7 @@ export class SegmentService {
       segment.desc_ru = body.desc_ru || segment.desc_ru;
       segment.imageUrl = image;
 
-      await this.segmentRepository.update(id, segment);
+      await this.segmentRepository.save(segment);
       return segment;
     } catch (err) {
       console.error(err);
@@ -124,7 +138,7 @@ export class SegmentService {
         throw new NotFoundException(`Category with ID ${id} not found`);
       }
       segment.imageUrl = path;
-      await this.segmentRepository.update(id, segment);
+      await this.segmentRepository.save(segment);
       return segment;
     } catch (err) {
       console.error(err);
