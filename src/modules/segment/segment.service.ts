@@ -145,4 +145,23 @@ export class SegmentService {
       throw new BadRequestException(err);
     }
   }
+  async getSegmentById(id: number): Promise<Segment | null> {
+    try {
+      const segment = await this.segmentRepository.findOne({
+        where: { id },
+        relations: ['subcategory'],
+      });
+      if (!segment) {
+        return null;
+      }
+
+      return {
+        ...segment,
+        imageUrl: process.env.BASE_URL + '/' + segment.imageUrl,
+      };
+    } catch (err) {
+      console.error(err);
+      throw new BadRequestException(err);
+    }
+  }
 }

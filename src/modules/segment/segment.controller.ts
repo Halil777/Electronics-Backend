@@ -9,6 +9,7 @@ import {
   BadRequestException,
   Delete,
   Patch,
+  NotFoundException, // Import NotFoundException
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -40,6 +41,14 @@ export class SegmentController {
     return await this.segmentService.addSegment(file, createSegmentDto);
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const segment = await this.segmentService.getSegmentById(+id);
+    if (!segment) {
+      throw new NotFoundException(`Segment with ID ${id} not found`);
+    }
+    return segment;
+  }
   @Get()
   async findAll() {
     return await this.segmentService.getAllSegments();
