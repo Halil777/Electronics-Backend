@@ -41,6 +41,9 @@ import { Partner } from './modules/partners/entities/partner.entity';
 import { PropertiesModule } from './modules/properties/properties.module';
 import { Property } from './modules/properties/entities/property.entity';
 import { JwtTokenModule } from './modules/jwt/jwt.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { Order } from './modules/orders/entities/order.entity';
+import { OrderItem } from './modules/orders/entities/order-item.entity';
 
 @Module({
   imports: [
@@ -92,6 +95,8 @@ import { JwtTokenModule } from './modules/jwt/jwt.module';
         AuctionNotification,
         Partner,
         Property,
+        Order,
+        OrderItem,
       ],
       synchronize: true, // Automatically sync schema; turn off in production
       logging: false,
@@ -115,6 +120,7 @@ import { JwtTokenModule } from './modules/jwt/jwt.module';
     PartnersModule,
     PropertiesModule,
     JwtTokenModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],

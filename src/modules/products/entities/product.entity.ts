@@ -1,5 +1,3 @@
-import { Brand } from 'src/modules/brands/entities/brand.entity';
-import { Segment } from 'src/modules/segment/entities/segment.entity';
 import {
   Column,
   Entity,
@@ -7,14 +5,20 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Brand } from '../../brands/entities/brand.entity';
 import { Subcategory } from '../../subcategories/entities/subcategory.entity';
 import { Property } from '../../properties/entities/property.entity';
+import { Segment } from 'src/modules/segment/entities/segment.entity';
+import { OrderItem } from 'src/modules/orders/entities/order-item.entity';
 
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid') // Changed to UUID
+  id: string;
 
   @Column({ type: 'varchar', length: 255 })
   title_tm: string;
@@ -85,29 +89,37 @@ export class Product {
   // Relationships
   @ManyToOne(() => Brand, (brand) => brand.products, { nullable: true })
   @JoinColumn({ name: 'brand_id' })
-  brand?: Brand;
+  brand?: Relation<Brand>;
 
   @Column({ nullable: true })
-  brand_id?: number;
+  brand_id?: string; // Changed to string
 
   @ManyToOne(() => Subcategory, (category) => category.products, {
     nullable: true,
   })
   @JoinColumn({ name: 'category_id' })
-  category?: Subcategory;
+  category?: Relation<Subcategory>;
 
   @Column({ nullable: true })
-  category_id?: number;
+  category_id?: string; // Changed to string
 
   @ManyToOne(() => Segment, (segment) => segment.products, { nullable: true })
   @JoinColumn({ name: 'segment_id' })
-  segment?: Segment;
-
-  @OneToMany(() => Property, (property) => property.product)
-  properties?: Property[];
+  segment?: Relation<Segment>;
 
   @Column({ nullable: true })
-  segment_id?: number;
+  segment_id?: string; // Changed to string
+
+  @ManyToMany(() => Property)
+  @JoinTable({
+    name: 'product_properties',
+    joinColumn: { name: 'product_id' },
+    inverseJoinColumn: { name: 'property_id' },
+  })
+  properties?: Relation<Property[]>;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems?: Relation<OrderItem[]>;
 
   // Meta-data
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

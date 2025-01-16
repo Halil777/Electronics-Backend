@@ -14,6 +14,7 @@ import {
   BadRequestException,
   ParseIntPipe,
   DefaultValuePipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -100,7 +101,9 @@ export class ProductsController {
   }
 
   @Get('client/products')
-  @ApiOperation({ summary: 'Get a list of all products with pagination' })
+  @ApiOperation({
+    summary: 'Get a list of all products for clients with pagination',
+  })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -160,20 +163,20 @@ export class ProductsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID' })
-  @ApiParam({ name: 'id', description: 'Product ID', type: Number })
+  @ApiParam({ name: 'id', description: 'Product ID', type: String })
   @ApiResponse({
     status: 200,
     description: 'Product successfully found.',
     type: Product,
   })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findById(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.productsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update product data and images' })
-  @ApiParam({ name: 'id', description: 'Product ID', type: Number })
+  @ApiParam({ name: 'id', description: 'Product ID', type: String })
   @ApiResponse({
     status: 200,
     description: 'Product successfully updated.',
@@ -201,7 +204,7 @@ export class ProductsController {
     }),
   )
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() images?: Express.Multer.File[],
   ) {
@@ -210,11 +213,11 @@ export class ProductsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a product' })
-  @ApiParam({ name: 'id', description: 'Product ID', type: Number })
+  @ApiParam({ name: 'id', description: 'Product ID', type: String })
   @ApiResponse({ status: 204, description: 'Product successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     await this.productsService.remove(id);
     return;
   }

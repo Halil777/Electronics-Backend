@@ -37,15 +37,18 @@ export class ProductsService {
     const { brand_id, segment_id, subcategory_id, ...productData } =
       createProductDto;
 
-    const product = this.productRepository.create(productData);
+    const product = this.productRepository.create({
+      ...productData,
+      brand_id: brand_id ? String(brand_id) : undefined,
+      category_id: subcategory_id ? String(subcategory_id) : undefined,
+      segment_id: segment_id ? String(segment_id) : undefined,
+    });
 
     if (brand_id) product.brand = await this.findBrand(brand_id);
     if (subcategory_id)
       product.category = await this.findCategory(subcategory_id); // Single category
     if (segment_id) product.segment = await this.findSegment(segment_id);
 
-    console.log(product.category);
-    console.log(subcategory_id);
     if (images?.length) {
       const baseUrl = `${process.env.BASE_URL}/upload/products`;
       product.images = images.map((file) => `${baseUrl}/${file.filename}`);
@@ -93,8 +96,6 @@ export class ProductsService {
     }
     const where = [];
 
-    console.log(categories);
-
     if (categories.length > 0) {
       where.push({
         category_id: In(categories.map((it) => it.id)),
@@ -116,12 +117,8 @@ export class ProductsService {
       });
     }
 
-    /*
-    
-        
-    */
     const [products, total] = await this.productRepository.findAndCount({
-      relations: ['brand', 'category', 'segment', 'properties'], // Updated to 'category'
+      relations: ['brand', 'category', 'segment', 'properties'],
       skip: (page - 1) * limit,
       take: limit,
       where: where,
@@ -133,12 +130,23 @@ export class ProductsService {
   /**
    * Retrieve a single product by ID
    */
-  async findById(id: number): Promise<Product> {
+  async findOne(id: string): Promise<Product | null> {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['brand', 'category', 'segment', 'properties'], // Updated to 'category'
+      relations: ['brand', 'category', 'segment', 'properties'],
     });
 
+    if (!product) {
+      return null;
+    }
+    return product;
+  }
+
+  async findById(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['brand', 'category', 'segment', 'properties'],
+    });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
@@ -149,7 +157,7 @@ export class ProductsService {
    * Update an existing product
    */
   async update(
-    id: number,
+    id: string,
     updateProductDto: UpdateProductDto,
     images?: Express.Multer.File[],
   ): Promise<Product> {
@@ -177,7 +185,7 @@ export class ProductsService {
   /**
    * Delete a product
    */
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const result = await this.productRepository.delete(id);
     if (!result.affected) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -197,7 +205,6 @@ export class ProductsService {
    * Helper method to find a category by ID
    */
   private async findCategory(id: number): Promise<Subcategory> {
-    console.log(id);
     const category = await this.categoryRepository.findOne({ where: { id } });
     if (!category)
       throw new NotFoundException(`Category with ID ${id} not found`);

@@ -10,6 +10,7 @@ import {
   Patch,
   UseGuards,
   Request,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -96,8 +97,8 @@ export class UsersController {
 
   // Get a single user by ID
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.usersService.findOne(id);
   }
 
   @Post('login')
@@ -132,21 +133,21 @@ export class UsersController {
     }),
   )
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
-      return await this.usersService.updateProfileImage(+id, file.path);
+      return await this.usersService.updateProfileImage(id, file.path);
     } else {
-      return await this.usersService.updateUser(+id, updateUserDto);
+      return await this.usersService.updateUser(id, updateUserDto);
     }
   }
 
   // Delete a user
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.deleteUser(+id);
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.usersService.deleteUser(id);
   }
 }
 

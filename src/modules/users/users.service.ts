@@ -44,7 +44,8 @@ export class UsersService {
     }
   }
 
-  async verifyOtp(userId: number): Promise<any> {
+  async verifyOtp(userId: string): Promise<any> {
+    // changed to string
     const user = await this.userRepository.update(userId, {
       is_confirmed: true,
     });
@@ -52,7 +53,8 @@ export class UsersService {
   }
 
   // Update a user's data
-  async updateUser(id: number, body: UpdateUserDto): Promise<User> {
+  async updateUser(id: string, body: UpdateUserDto): Promise<User> {
+    // changed to string
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
@@ -90,7 +92,8 @@ export class UsersService {
   }
 
   // Delete a user by ID
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: string): Promise<void> {
+    // changed to string
     try {
       const result = await this.userRepository.delete({ id });
       if (!result.affected) {
@@ -103,7 +106,8 @@ export class UsersService {
   }
 
   // Update a user's profile image
-  async updateProfileImage(id: number, path: string): Promise<User> {
+  async updateProfileImage(id: string, path: string): Promise<User> {
+    // changed to string
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
@@ -120,7 +124,8 @@ export class UsersService {
   }
 
   // Get a user by ID with formatted profile image URL
-  async findOne(id: number): Promise<User> {
+  async findOne(id: string): Promise<User> {
+    // changed to string
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {

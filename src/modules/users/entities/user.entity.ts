@@ -1,9 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  Relation,
+} from 'typeorm';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity('users') // The table name in the database
 export class User {
-  @PrimaryGeneratedColumn() // Automatically generates a unique identifier
-  id: number;
+  @PrimaryGeneratedColumn('uuid') // Automatically generates a unique identifier
+  id: string;
 
   @Column({ type: 'varchar', length: 50 })
   firstName: string;
@@ -38,6 +45,9 @@ export class User {
     default: false,
   })
   is_notify: boolean;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Relation<Order[]>;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
