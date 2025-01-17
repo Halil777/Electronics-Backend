@@ -2,22 +2,22 @@ import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
 import { PropertyType } from '../entities/property.entity';
 
 export class CreatePropertyDto {
-  @IsOptional()
+  @IsNotEmpty()
   title_tm: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   title_ru: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   title_en: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   value_tm: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   value_ru: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   value_en: string;
 
   @IsIn([PropertyType.COLOR, PropertyType.PLAIN])
