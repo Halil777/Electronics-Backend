@@ -98,7 +98,7 @@ import { OrderItem } from './modules/orders/entities/order-item.entity';
         Order,
         OrderItem,
       ],
-      synchronize: false, // Automatically sync schema; turn off in production
+      synchronize: true, // Automatically sync schema; turn off in production
       logging: false,
     }),
 
