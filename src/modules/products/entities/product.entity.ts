@@ -112,7 +112,7 @@ export class Product {
 
   @ManyToMany(() => Property)
   @JoinTable({
-    name: 'product_properties',
+    name: 'properties',
     joinColumn: { name: 'product_id' },
     inverseJoinColumn: { name: 'property_id' },
   })
