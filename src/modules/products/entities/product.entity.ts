@@ -6,8 +6,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   Relation,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import { Brand } from '../../brands/entities/brand.entity';
 import { Subcategory } from '../../subcategories/entities/subcategory.entity';
@@ -17,8 +15,8 @@ import { OrderItem } from 'src/modules/orders/entities/order-item.entity';
 
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn('uuid') // Changed to UUID
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ type: 'varchar', length: 255 })
   title_tm: string;
@@ -92,7 +90,7 @@ export class Product {
   brand?: Relation<Brand>;
 
   @Column({ nullable: true })
-  brand_id?: string; // Changed to string
+  brand_id?: number;
 
   @ManyToOne(() => Subcategory, (category) => category.products, {
     nullable: true,
@@ -101,22 +99,17 @@ export class Product {
   category?: Relation<Subcategory>;
 
   @Column({ nullable: true })
-  category_id?: string; // Changed to string
+  category_id?: number;
 
   @ManyToOne(() => Segment, (segment) => segment.products, { nullable: true })
   @JoinColumn({ name: 'segment_id' })
   segment?: Relation<Segment>;
 
-  @Column({ nullable: true })
-  segment_id?: string; // Changed to string
-
-  @ManyToMany(() => Property)
-  @JoinTable({
-    name: 'property',
-    joinColumn: { name: 'product_id' },
-    inverseJoinColumn: { name: 'property_id' },
-  })
+  @OneToMany(() => Property, (property) => property.product)
   properties?: Relation<Property[]>;
+
+  @Column({ nullable: true })
+  segment_id?: number;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
   orderItems?: Relation<OrderItem[]>;
