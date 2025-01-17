@@ -49,9 +49,9 @@ export class OrdersService {
         );
       }
 
-      // Create Product Object
+      // Create Product Object and ensure the ID is a number
       const productEntity = new Product();
-      productEntity.id = itemDto.productId;
+      productEntity.id = Number(itemDto.productId); // Преобразуем в число
 
       const orderItem = this.orderItemRepository.create({
         product: productEntity,
@@ -85,7 +85,7 @@ export class OrdersService {
 
   async findOne(id: string): Promise<Order | null> {
     return await this.orderRepository.findOne({
-      where: { id },
+      where: { id: String(id) }, // Преобразуем в строку
       relations: ['user', 'orderItems', 'orderItems.product'],
     });
   }
@@ -94,18 +94,17 @@ export class OrdersService {
     id: string,
     updateOrderDto: UpdateOrderDto,
   ): Promise<Order | null> {
-    const order = await this.orderRepository.findOneBy({ id });
+    const order = await this.orderRepository.findOneBy({ id: String(id) }); // Преобразуем в строку
     if (!order) {
       return null;
     }
 
     Object.assign(order, updateOrderDto);
-
     return await this.orderRepository.save(order);
   }
 
   async remove(id: string): Promise<DeleteResult> {
-    const order = await this.orderRepository.findOneBy({ id });
+    const order = await this.orderRepository.findOneBy({ id: String(id) }); // Преобразуем в строку
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }

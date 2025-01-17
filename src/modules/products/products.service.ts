@@ -39,9 +39,6 @@ export class ProductsService {
 
     const product = this.productRepository.create({
       ...productData,
-      brand_id: brand_id ? String(brand_id) : undefined,
-      category_id: subcategory_id ? String(subcategory_id) : undefined,
-      segment_id: segment_id ? String(segment_id) : undefined,
     });
 
     if (brand_id) product.brand = await this.findBrand(brand_id);
@@ -131,8 +128,9 @@ export class ProductsService {
    * Retrieve a single product by ID
    */
   async findOne(id: string): Promise<Product | null> {
+    const productId = Number(id); // Преобразуем строку в число
     const product = await this.productRepository.findOne({
-      where: { id },
+      where: { id: productId }, // Используем число для поиска
       relations: ['brand', 'category', 'segment', 'properties'],
     });
 
@@ -143,10 +141,12 @@ export class ProductsService {
   }
 
   async findById(id: string): Promise<Product> {
+    const productId = Number(id); // Преобразуем строку в число
     const product = await this.productRepository.findOne({
-      where: { id },
+      where: { id: productId }, // Используем число для поиска
       relations: ['brand', 'category', 'segment', 'properties'],
     });
+
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
